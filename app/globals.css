@@ -1,0 +1,13 @@
+@import 'tailwindcss';
+
+/* The shop machine is a desktop PC with a mouse, used all day by people who
+ * are standing up and often in a hurry. Bigger default text and taller hit
+ * targets than a marketing site would use. */
+@theme {
+  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}

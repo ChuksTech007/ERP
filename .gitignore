@@ -1,0 +1,17 @@
+node_modules/
+.next/
+out/
+build/
+
+# The shop's actual books. Never committed — this is live business data, and
+# the WAL/SHM sidecars are meaningless without the file they belong to.
+data/
+*.db
+*.db-wal
+*.db-shm
+backups/
+
+.env
+.env.local
+*.log
+.DS_Store
