@@ -1,12 +1,14 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { requireUser, canManage, canSeeCosts } from '@/lib/auth';
 import { parseAmount } from '@/lib/money';
 import {
   createPriceItem,
   updatePriceItem,
   retirePriceItem,
   restorePriceItem,
+  getPriceItem,
 } from '@/lib/price-items';
 
 /**
@@ -39,7 +41,16 @@ function readForm(formData) {
   };
 }
 
+/* Every action re-checks for itself. The layout guard covers the page, not
+ * these — a server action is a POST endpoint anyone can call directly. */
+async function guard() {
+  const user = await requireUser();
+  if (!canManage(user)) throw new Error('Only the owner or a manager can change prices.');
+  return user;
+}
+
 export async function savePriceItem(_previous, formData) {
+  const user = await guard();
   const id = formData.get('id');
 
   let input;
@@ -51,6 +62,14 @@ export async function savePriceItem(_previous, formData) {
     return { ok: false, errors: [error.message] };
   }
 
+  /* A manager never sees the cost field, so their form does not submit one
+   * and it would arrive here as zero — silently wiping the owner's cost
+   * figures, and with them every margin in the shop, the first time a manager
+   * corrected a spelling. Carry the stored value through instead. */
+  if (!canSeeCosts(user) && id) {
+    input.costKobo = getPriceItem(String(id))?.cost_kobo ?? 0;
+  }
+
   const result = id ? updatePriceItem(String(id), input) : createPriceItem(input);
 
   if (result.ok) revalidatePath('/pricelist');
@@ -58,11 +77,13 @@ export async function savePriceItem(_previous, formData) {
 }
 
 export async function retire(formData) {
+  await guard();
   retirePriceItem(String(formData.get('id')));
   revalidatePath('/pricelist');
 }
 
 export async function restore(formData) {
+  await guard();
   restorePriceItem(String(formData.get('id')));
   revalidatePath('/pricelist');
 }

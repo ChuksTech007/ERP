@@ -59,7 +59,7 @@ function workedExample({ category, mode, price, mouldingWidthMm, wastageMm, cutt
 const field = 'w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-500 focus:outline-none';
 const label = 'block text-xs font-medium uppercase tracking-wide text-stone-500';
 
-export default function PriceForm({ item = null, onDone }) {
+export default function PriceForm({ item = null, onDone, showCosts = false }) {
   const [state, action, pending] = useActionState(savePriceItem, null);
 
   const [category, setCategory] = useState(item?.category || 'moulding');
@@ -148,20 +148,22 @@ export default function PriceForm({ item = null, onDone }) {
           />
         </div>
 
-        <div>
-          <label className={label} htmlFor="cost">
-            Cost to us ({MODE_LABELS[mode]})
-          </label>
-          <input
-            id="cost"
-            name="cost"
-            className={field}
-            defaultValue={item ? String(item.cost_kobo / 100) : ''}
-            placeholder="Optional"
-            inputMode="decimal"
-          />
-          <p className="mt-1 text-xs text-stone-500">Owner only. Drives the profit figure.</p>
-        </div>
+        {showCosts && (
+          <div>
+            <label className={label} htmlFor="cost">
+              Cost to us ({MODE_LABELS[mode]})
+            </label>
+            <input
+              id="cost"
+              name="cost"
+              className={field}
+              defaultValue={item ? String(item.cost_kobo / 100) : ''}
+              placeholder="Optional"
+              inputMode="decimal"
+            />
+            <p className="mt-1 text-xs text-stone-500">Owner only. Drives the profit figure.</p>
+          </div>
+        )}
 
         {category === 'moulding' && (
           <>

@@ -1,15 +1,26 @@
 import { listPriceItems, CATEGORY_LABELS, MODE_LABELS } from '@/lib/price-items';
 import { formatNaira } from '@/lib/money';
+import { requireUser, canSeeCosts, canManage } from '@/lib/auth';
 import { retire, restore } from './actions';
 import PriceForm from './PriceForm';
 
 export const dynamic = 'force-dynamic';
 
 export default async function PriceListPage({ searchParams }) {
+  const user = await requireUser();
+  const showCosts = canSeeCosts(user);
+  const mayEdit = canManage(user);
+
   const params = await searchParams;
   const showRetired = params?.retired === '1';
 
-  const items = listPriceItems({ includeRetired: showRetired });
+  const rawItems = listPriceItems({ includeRetired: showRetired });
+
+  /* Costs are stripped here, on the server, rather than hidden with CSS. A
+   * column merely hidden in the browser is still in the page source, and
+   * "what does the shop pay for oak" is exactly the figure that should not
+   * leave the owner. */
+  const items = showCosts ? rawItems : rawItems.map(({ cost_kobo, ...rest }) => rest);
 
   // Grouped for reading, because staff look for "the mouldings" rather than
   // scanning one long alphabetical list.
@@ -38,7 +49,13 @@ export default async function PriceListPage({ searchParams }) {
         </div>
       )}
 
-      <PriceForm />
+      {mayEdit ? (
+        <PriceForm showCosts={showCosts} />
+      ) : (
+        <p className="rounded-lg border border-stone-200 bg-white p-4 text-sm text-stone-600">
+          Prices are set by the owner. You can quote from this list but not change it.
+        </p>
+      )}
 
       {[...groups.entries()].map(([category, rows]) => (
         <section key={category}>
@@ -52,7 +69,7 @@ export default async function PriceListPage({ searchParams }) {
                   <th className="px-4 py-2 font-medium">Name</th>
                   <th className="px-4 py-2 font-medium">Charged</th>
                   <th className="px-4 py-2 text-right font-medium">Price</th>
-                  <th className="px-4 py-2 text-right font-medium">Cost</th>
+                  {showCosts && <th className="px-4 py-2 text-right font-medium">Cost</th>}
                   <th className="px-4 py-2"></th>
                 </tr>
               </thead>
@@ -73,16 +90,20 @@ export default async function PriceListPage({ searchParams }) {
                     </td>
                     <td className="px-4 py-2 text-stone-600">{MODE_LABELS[item.mode]}</td>
                     <td className="px-4 py-2 text-right tabular-nums">{formatNaira(item.price_kobo)}</td>
-                    <td className="px-4 py-2 text-right tabular-nums text-stone-500">
-                      {item.cost_kobo ? formatNaira(item.cost_kobo) : '—'}
-                    </td>
+                    {showCosts && (
+                      <td className="px-4 py-2 text-right tabular-nums text-stone-500">
+                        {item.cost_kobo ? formatNaira(item.cost_kobo) : '—'}
+                      </td>
+                    )}
                     <td className="px-4 py-2 text-right">
-                      <form action={item.deleted_at ? restore : retire}>
-                        <input type="hidden" name="id" value={item.id} />
-                        <button className="text-xs text-stone-500 hover:text-stone-900">
-                          {item.deleted_at ? 'Restore' : 'Retire'}
-                        </button>
-                      </form>
+                      {mayEdit && (
+                        <form action={item.deleted_at ? restore : retire}>
+                          <input type="hidden" name="id" value={item.id} />
+                          <button className="text-xs text-stone-500 hover:text-stone-900">
+                            {item.deleted_at ? 'Restore' : 'Retire'}
+                          </button>
+                        </form>
+                      )}
                     </td>
                   </tr>
                 ))}
