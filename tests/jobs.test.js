@@ -400,3 +400,25 @@ test('a full job from counter to collection leaves the books sound', () => {
   assert.equal(accountBalance(ACCT.BANK, { db }), total - deposit);
   assert.equal(inCustody({ db }).length, 0);
 });
+
+test('the margin shown is the cost the ledger will actually charge', () => {
+  const { db, oak, glass, oakMat } = shop();
+
+  /* The price list says oak costs N1,800 per metre. The supplier's pack price
+   * says N10,500 per 3m length, which is N3,500 per metre. Those cannot both
+   * be true, and the ledger uses the pack price when it charges stock out.
+   * The quote must use the same one, or the owner is shown a margin that the
+   * books will never agree with. */
+  db.prepare('UPDATE price_items SET cost_kobo = ? WHERE id = ?').run(parseAmount('1,800'), oak);
+
+  const { id } = quoteFor(db, oak, glass);
+  const job = getJob(id, { db });
+
+  acceptQuote({ jobId: id, depositKobo: 0 }, { db });
+  moveStage({ jobId: id, stage: 'done' }, { db });
+  collectJob({ jobId: id, paymentKobo: job.total_kobo, releasedTo: 'Mrs Adeyemi' }, { db });
+
+  // What the job estimated and what the books charged must agree.
+  const charged = accountBalance(ACCT.COST_OF_MATERIALS, { db });
+  assert.equal(job.cost_kobo, charged);
+});

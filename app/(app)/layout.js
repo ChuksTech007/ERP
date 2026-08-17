@@ -12,7 +12,9 @@ export default async function AppLayout({ children }) {
 
   const nav = [
     { href: '/', label: 'Today' },
+    { href: '/jobs', label: 'Jobs' },
     { href: '/customers', label: 'Customers' },
+    { href: '/stock', label: 'Stock' },
     { href: '/pricelist', label: 'Price list' },
   ];
 
