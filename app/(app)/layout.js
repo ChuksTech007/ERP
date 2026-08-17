@@ -16,6 +16,7 @@ export default async function AppLayout({ children }) {
     { href: '/customers', label: 'Customers' },
     { href: '/stock', label: 'Stock' },
     { href: '/pricelist', label: 'Price list' },
+    { href: '/money', label: 'Money' },
   ];
 
   return (
