@@ -13,7 +13,7 @@ function freshDb() {
 test('the migrations apply to an empty database', () => {
   const db = openMemoryDb();
   const applied = migrate({ db });
-  assert.deepEqual(applied, ['001_foundation.sql', '002_jobs_and_money.sql']);
+  assert.deepEqual(applied, ['001_foundation.sql', '002_jobs_and_money.sql', '003_stock_value.sql']);
 });
 
 test('running the migrator again does nothing', () => {
