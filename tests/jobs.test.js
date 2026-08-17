@@ -422,3 +422,19 @@ test('the margin shown is the cost the ledger will actually charge', () => {
   const charged = accountBalance(ACCT.COST_OF_MATERIALS, { db });
   assert.equal(job.cost_kobo, charged);
 });
+
+test('a quote refuses to silently drop a part it cannot find', () => {
+  const { db, oak, glass } = shop();
+
+  // The moulding is deleted outright, as a bad migration or a stray script
+  // might do.
+  db.prepare('DELETE FROM price_items WHERE id = ?').run(oak);
+
+  const result = quoteFor(db, oak, glass);
+
+  /* Skipping it quietly would be far worse than failing: the quote still
+   * comes out with a number on it, just missing the frame, and nobody notices
+   * until it has been sold for the price of its glass. */
+  assert.equal(result.ok, false);
+  assert.match(result.errors[0], /no longer on the price list/);
+});

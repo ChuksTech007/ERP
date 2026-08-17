@@ -160,3 +160,17 @@ test('retiring something that is not there fails quietly', () => {
   const db = freshDb();
   assert.equal(retirePriceItem('no-such-id', { db }).ok, false);
 });
+
+test('a price item with no cost entered is accepted', () => {
+  const db = freshDb();
+  // Cost is optional on the form. Treating an empty field as invalid refused
+  // the item with the bewildering message "the cost cannot be negative", and
+  // would have hit the owner on their very first moulding.
+  const result = createPriceItem(
+    { name: 'Oak 40mm', category: 'moulding', mode: 'per_m', priceKobo: 350000, mouldingWidthMm: 40 },
+    { db }
+  );
+
+  assert.equal(result.ok, true);
+  assert.equal(listPriceItems({ db })[0].cost_kobo, 0);
+});
