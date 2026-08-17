@@ -14,9 +14,11 @@ export default async function AppLayout({ children }) {
     { href: '/', label: 'Today' },
     { href: '/jobs', label: 'Jobs' },
     { href: '/customers', label: 'Customers' },
+    { href: '/invoices', label: 'Invoices' },
     { href: '/stock', label: 'Stock' },
     { href: '/pricelist', label: 'Price list' },
     { href: '/money', label: 'Money' },
+    ...(canSeeCosts(user) ? [{ href: '/reports', label: 'Reports' }] : []),
   ];
 
   return (

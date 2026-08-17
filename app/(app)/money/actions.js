@@ -5,6 +5,7 @@ import { requireUser, canManage, canSeeCosts } from '@/lib/auth';
 import { parseAmount } from '@/lib/money';
 import { recordExpense } from '@/lib/expenses';
 import { setSettings } from '@/lib/settings';
+import { createSupplier, paySupplier } from '@/lib/suppliers';
 
 export async function addExpense(_previous, formData) {
   const user = await requireUser();
@@ -63,4 +64,42 @@ export async function saveSettings(_previous, formData) {
   revalidatePath('/money');
   revalidatePath('/jobs/new');
   return { ok: true };
+}
+
+
+export async function addSupplier(_previous, formData) {
+  const user = await requireUser();
+  if (!canManage(user)) throw new Error('Only the owner or a manager can add a supplier.');
+
+  const result = createSupplier({
+    name: String(formData.get('name') || ''),
+    phone: String(formData.get('phone') || '') || null,
+    email: String(formData.get('email') || '') || null,
+  });
+
+  if (result.ok) revalidatePath('/money');
+  return result;
+}
+
+export async function paySupplierAction(_previous, formData) {
+  const user = await requireUser();
+  if (!canSeeCosts(user)) throw new Error('Only the owner can pay suppliers.');
+
+  let amountKobo;
+  try {
+    amountKobo = parseAmount(formData.get('amount'));
+  } catch (error) {
+    return { ok: false, errors: [error.message] };
+  }
+
+  const result = paySupplier({
+    supplierId: String(formData.get('supplierId')),
+    amountKobo,
+    method: String(formData.get('method') || 'transfer'),
+    reference: String(formData.get('reference') || '') || null,
+    userId: user.id,
+  });
+
+  if (result.ok) { revalidatePath('/money'); revalidatePath('/reports'); }
+  return result;
 }

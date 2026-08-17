@@ -6,6 +6,7 @@ import { STAGES, STATUSES, nextStage } from '@/lib/job-catalog';
 import { formatNaira } from '@/lib/money';
 import { formatSize } from '@/lib/measure';
 import { getDb } from '@/lib/db';
+import { getSale } from '@/lib/sales';
 import { AcceptForm, CollectForm } from './JobActions';
 import { stage, cancel } from '../actions';
 
@@ -23,6 +24,9 @@ export default async function JobPage({ params }) {
 
   const held = job.custody.filter((c) => !c.released_at);
   const upcoming = nextStage(job.stage);
+
+  const invoiceRow = getDb().prepare('SELECT id FROM sales WHERE job_id = ?').get(job.id);
+  const invoice = invoiceRow ? getSale(invoiceRow.id) : null;
 
   return (
     <div className="space-y-6">
@@ -42,6 +46,21 @@ export default async function JobPage({ params }) {
 
         <div className="text-right">
           <div className="text-2xl font-semibold tabular-nums">{formatNaira(job.total_kobo)}</div>
+          {/* Paper the shop actually needs at the counter and on the bench. */}
+          <div className="mt-2 flex justify-end gap-2 text-xs">
+            {job.status !== 'quote' && (
+              <a href={`/ticket/${job.id}`} target="_blank" rel="noreferrer"
+                 className="rounded border border-stone-300 px-2 py-1 hover:bg-stone-100">
+                Job ticket
+              </a>
+            )}
+            {held.length > 0 && (
+              <a href={`/slip/${job.id}`} target="_blank" rel="noreferrer"
+                 className="rounded border border-stone-300 px-2 py-1 hover:bg-stone-100">
+                Claim slip
+              </a>
+            )}
+          </div>
           {job.paidKobo !== 0 && (
             <div className="text-sm text-stone-600">
               paid {formatNaira(job.paidKobo)} · balance {formatNaira(job.total_kobo - job.paidKobo)}
@@ -145,6 +164,24 @@ export default async function JobPage({ params }) {
       )}
 
       {job.status === 'ready' && <CollectForm job={job} />}
+
+      {job.status === 'collected' && invoice && (
+        <section className="rounded-lg border border-stone-200 bg-white p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-stone-500">Invoice</h2>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-sm">
+            <span>
+              <Link href={`/invoices/${invoice.id}`} className="font-mono hover:underline">
+                {invoice.invoice_number}
+              </Link>
+              <span className="ml-3 text-stone-500">{invoice.status}</span>
+            </span>
+            <a href={`/receipt/${invoice.id}`} target="_blank" rel="noreferrer"
+               className="rounded border border-stone-300 px-3 py-1.5 text-xs hover:bg-stone-100">
+              Print receipt
+            </a>
+          </div>
+        </section>
+      )}
 
       {/* --- history */}
       {job.events.length > 0 && (

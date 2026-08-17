@@ -11,3 +11,34 @@ html,
 body {
   height: 100%;
 }
+
+/* Paper.
+ *
+ * The shop prints claim slips and receipts on a narrow roll and job tickets
+ * on whatever is in the tray, so the page is left to size itself and only the
+ * margins are pinned down. Backgrounds are forced to print — a heading whose
+ * colour the browser decides to drop comes out blank. */
+@media print {
+  @page {
+    margin: 6mm;
+  }
+
+  html,
+  body {
+    height: auto;
+    background: #fff;
+    color: #000;
+    font-size: 11px;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Never split a claim ticket across two pieces of paper: half a tag number
+     is worse than none. */
+  article {
+    break-inside: avoid;
+  }
+}

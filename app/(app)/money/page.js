@@ -5,6 +5,8 @@ import { trialBalance, totalsByType, accountBalance } from '@/lib/ledger';
 import { ACCT } from '@/lib/chart-of-accounts';
 import { formatNaira } from '@/lib/money';
 import { ExpenseForm, SettingsForm } from './MoneyForms';
+import SupplierPanel from './SupplierForms';
+import { listSuppliers, supplierPayments } from '@/lib/suppliers';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,6 +24,9 @@ export default async function MoneyPage() {
   const spending = owner ? expensesByAccount({ from }) : [];
   const recent = owner ? listExpenses({ limit: 20 }) : [];
   const books = owner ? trialBalance() : null;
+  const suppliers = owner ? listSuppliers() : [];
+  const paidOut = owner ? supplierPayments({ limit: 10 }) : [];
+  const owedToSuppliers = owner ? accountBalance(ACCT.PAYABLE) : 0;
 
   return (
     <div className="space-y-8">
@@ -51,6 +56,8 @@ export default async function MoneyPage() {
           </p>
 
           <ExpenseForm accounts={accounts} />
+
+          <SupplierPanel suppliers={suppliers} owedKobo={owedToSuppliers} payments={paidOut} />
 
           {spending.length > 0 && (
             <section>

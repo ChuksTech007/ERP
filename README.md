@@ -127,6 +127,38 @@ Then take a quote.
 A deposit is money **held**, not earned. The shop's income only counts when the
 work is handed over.
 
+### Paper
+
+- **Claim slip** — printed when a job is accepted. Two copies per item: one is
+  tied to the picture, one goes home with the customer. The tag number is
+  large because it gets read down a telephone and copied onto a tag by hand,
+  and a misread digit puts somebody else's irreplaceable photograph into the
+  wrong hands. The condition noted at intake is printed on the customer's copy
+  too, so it is a fact both sides agreed to rather than the shop's word.
+- **Job ticket** — for the bench. Cutting sizes and materials, and
+  deliberately **no prices**: the framer needs the glass size, not the margin,
+  and a customer may be looking over the counter.
+- **Receipt** — printed from an invoice, showing deposits, payments and
+  anything still to pay.
+
+---
+
+## Money
+
+- **Invoices** are raised when work is handed over. A deposit taken earlier
+  still counts against the invoice, so the shop never chases somebody who has
+  already paid half.
+- **Refunds** are recorded as money going back out, never by altering what was
+  taken — otherwise the day's takings would look as though the money had never
+  arrived.
+- **Cancelling an invoice** reverses its ledger entry and keeps the number in
+  the book. A missing invoice number looks exactly like a sale somebody
+  pocketed. Money already paid is flagged, not swept away.
+- **Suppliers** — stock taken on credit becomes a debt. Paying it down reduces
+  the debt only; the materials became a cost when they were received.
+- **Reports** — profit and loss, what the shop owns and owes, today's takings
+  split cash from card, and a full account listing for an accountant.
+
 ---
 
 ## Day to day
