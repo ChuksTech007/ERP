@@ -105,6 +105,10 @@ thing.
 3. **Settings** — minimum charge, default labour, deposit percentage. These are
    commercial decisions and start at zero.
 
+4. **Staff** — one login per person. A shared login means nobody's name is on
+   anything, and the first time money goes missing there is no way to ask who.
+   Only the owner sees costs, margins and the books.
+
 Then take a quote.
 
 ---
@@ -126,6 +130,30 @@ Then take a quote.
 
 A deposit is money **held**, not earned. The shop's income only counts when the
 work is handed over.
+
+---
+
+## Selling over the counter
+
+Not everything is a framing job. Someone walks in for a ready-made frame, a
+packet of hooks or a reprint, pays and leaves — that is **Counter**, and it
+raises an invoice and takes the money in one step. No quote, no bench, no tag
+on anyone's picture.
+
+- Items priced **each** appear in the dropdown. Anything charged **per metre**
+  or **per square metre** does not, because it has no price until somebody says
+  how big — that conversation is a quote.
+- Anything not on the price list can be typed straight in with its price.
+- Prices fill in from the list and stay editable. The counter haggles, and a
+  till that cannot be overridden gets worked around with a calculator.
+- Type what the customer handed over and the screen works out the **change**.
+  Only what the sale is worth is recorded; change comes out of the drawer.
+- A name is optional. Most walk-ins do not give one, and forcing it produces a
+  customer list full of "Customer" and "Walk in".
+- If the price list item is linked to a material counted in **pieces**, the
+  stock comes off the shelf automatically. Anything measured by the metre or by
+  area is left alone — there is no way to know how much came off the roll, and
+  a guess would be worse than the honest gap.
 
 ### Paper
 
@@ -184,9 +212,13 @@ clear the test data" is a sentence people say afterwards.
   millimetres**. No float ever touches a price.
 - `better-sqlite3` is pinned to **v11**. Version 13 installs cleanly and then
   segfaults on Windows with no stack trace.
-- Client components import labels from `lib/*-catalog.js`, never from the
-  modules that touch the database — importing those pulls a compiled binary
-  into the browser bundle and the build error points at the wrong file.
+- Client components import labels from `lib/*-catalog.js` and `lib/roles.js`,
+  never from the modules that touch the database — importing those pulls a
+  compiled binary into the browser bundle and the build error points at the
+  wrong file.
+- A sale is created in exactly two places: `collectJob` (a framing job is
+  handed over) and `counterSale` (something sold off the shelf). Both raise the
+  invoice, take the money and move the stock inside one transaction.
 - `sales` has no `amount_paid` or `status` column on purpose. They are sums
   over `payments`; two places that can disagree eventually will.
 - Every quote stores its own `breakdown_json`. That duplication is the only

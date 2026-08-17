@@ -114,19 +114,32 @@ export default async function StockPage({ searchParams }) {
                         {movements.length > 0 && (
                           <div>
                             <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-stone-500">
-                              Recent movements
+                              Recent movements — why the figure is what it is
                             </h3>
                             <div className="overflow-hidden rounded border border-stone-200 bg-white">
                               {movements.map((movement) => (
                                 <div
                                   key={movement.id}
-                                  className="flex items-center justify-between border-b border-stone-100 px-3 py-1.5 text-xs last:border-0"
+                                  className="grid grid-cols-12 gap-2 border-b border-stone-100 px-3 py-1.5 text-xs last:border-0"
                                 >
-                                  <span>{MOVEMENT_LABELS[movement.kind] || movement.kind}</span>
-                                  <span className="text-stone-500">{movement.reason}</span>
-                                  <span className={`tabular-nums ${movement.delta_base < 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
-                                    {movement.delta_base > 0 ? '+' : ''}
-                                    {movement.delta_base}
+                                  <span className="col-span-2 tabular-nums text-stone-500">
+                                    {new Date(movement.created_at).toLocaleDateString('en-NG', {
+                                      day: '2-digit', month: 'short',
+                                    })}
+                                  </span>
+                                  <span className="col-span-3">{MOVEMENT_LABELS[movement.kind] || movement.kind}</span>
+                                  <span className="col-span-3 truncate text-stone-500" title={movement.reason || ''}>
+                                    {movement.reason}
+                                  </span>
+                                  {/* Shown the way the shelf is counted, not in raw
+                                      millimetres. "-3920" means nothing to the person
+                                      holding the length of oak. */}
+                                  <span className={`col-span-2 text-right tabular-nums ${movement.delta_base < 0 ? 'text-amber-700' : 'text-emerald-700'}`}>
+                                    {movement.delta_base > 0 ? '+' : '−'}
+                                    {formatQuantity(Math.abs(movement.delta_base), material)}
+                                  </span>
+                                  <span className="col-span-2 text-right tabular-nums text-stone-500">
+                                    {formatQuantity(movement.balance_after, material)}
                                   </span>
                                 </div>
                               ))}

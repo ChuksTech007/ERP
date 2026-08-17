@@ -24,7 +24,12 @@ export default async function InvoicePage({ params }) {
             {sale.customer_name}
           </h1>
           <p className="mt-1 text-sm text-stone-600">
-            {new Date(sale.sold_at).toLocaleDateString()} · {sale.status}
+            {new Date(sale.sold_at).toLocaleDateString()} · {sale.status} ·{' '}
+            {sale.job_id ? (
+              <Link href={`/jobs/${sale.job_id}`} className="underline">from a framing job</Link>
+            ) : (
+              'sold over the counter'
+            )}
           </p>
         </div>
         <div className="text-right">

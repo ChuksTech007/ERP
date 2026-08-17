@@ -159,16 +159,16 @@ function ReceiveForm({ material }) {
       <input type="hidden" name="materialId" value={material.id} />
       <div className="grid gap-3 sm:grid-cols-3">
         <div>
-          <label className={label}>How many {material.pack_label}s</label>
-          <input name="packs" className={field} value={packs} onChange={(e) => setPacks(e.target.value)} inputMode="decimal" required />
+          <label className={label} htmlFor={`packs-${material.id}`}>How many {material.pack_label}s</label>
+          <input id={`packs-${material.id}`} name="packs" className={field} value={packs} onChange={(e) => setPacks(e.target.value)} inputMode="decimal" required />
         </div>
         <div>
-          <label className={label}>Cost per {material.pack_label}</label>
-          <input name="packCost" className={field} value={cost} onChange={(e) => setCost(e.target.value)} inputMode="decimal" />
+          <label className={label} htmlFor={`packCost-${material.id}`}>Cost per {material.pack_label}</label>
+          <input id={`packCost-${material.id}`} name="packCost" className={field} value={cost} onChange={(e) => setCost(e.target.value)} inputMode="decimal" />
         </div>
         <div>
-          <label className={label}>Paid by</label>
-          <select name="method" className={field}>
+          <label className={label} htmlFor={`method-${material.id}`}>Paid by</label>
+          <select id={`method-${material.id}`} name="method" className={field}>
             <option value="cash">Cash</option>
             <option value="transfer">Transfer</option>
             <option value="pos">POS</option>
@@ -199,12 +199,12 @@ function BreakageForm({ material }) {
       <input type="hidden" name="materialId" value={material.id} />
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className={label}>How much was lost ({material.base_unit})</label>
-          <input name="quantityBase" className={field} inputMode="numeric" required />
+          <label className={label} htmlFor={`lost-${material.id}`}>How much was lost ({material.base_unit})</label>
+          <input id={`lost-${material.id}`} name="quantityBase" className={field} inputMode="numeric" required />
         </div>
         <div>
-          <label className={label}>What happened</label>
-          <input name="reason" className={field} placeholder="Sheet cracked lifting it off the rack" required />
+          <label className={label} htmlFor={`lostWhy-${material.id}`}>What happened</label>
+          <input id={`lostWhy-${material.id}`} name="reason" className={field} placeholder="Sheet cracked lifting it off the rack" required />
         </div>
       </div>
       <p className="text-xs text-amber-800">
@@ -227,12 +227,12 @@ function CountForm({ material }) {
       <input type="hidden" name="materialId" value={material.id} />
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label className={label}>Counted on the shelf ({material.base_unit})</label>
-          <input name="countedBase" className={field} value={counted} onChange={(e) => setCounted(e.target.value)} inputMode="numeric" required />
+          <label className={label} htmlFor={`counted-${material.id}`}>Counted on the shelf ({material.base_unit})</label>
+          <input id={`counted-${material.id}`} name="countedBase" className={field} value={counted} onChange={(e) => setCounted(e.target.value)} inputMode="numeric" required />
         </div>
         <div>
-          <label className={label}>Why it differs</label>
-          <input name="reason" className={field} placeholder="Monthly count" required />
+          <label className={label} htmlFor={`countWhy-${material.id}`}>Why it differs</label>
+          <input id={`countWhy-${material.id}`} name="reason" className={field} placeholder="Monthly count" required />
         </div>
       </div>
 
@@ -256,8 +256,8 @@ function OpeningForm({ material }) {
     <form action={action} className="space-y-3 rounded border border-stone-200 bg-stone-50 p-4">
       <input type="hidden" name="materialId" value={material.id} />
       <div>
-        <label className={label}>Already on the shelf ({material.base_unit})</label>
-        <input name="quantityBase" className={field} inputMode="numeric" required />
+        <label className={label} htmlFor={`opening-${material.id}`}>Already on the shelf ({material.base_unit})</label>
+        <input id={`opening-${material.id}`} name="quantityBase" className={field} inputMode="numeric" required />
         <p className="mt-1 text-xs text-stone-500">
           Stock the shop already owned before using this system. Can only be set once.
         </p>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { requireUser } from '@/lib/auth';
-import { listSales } from '@/lib/sales';
+import { listSales, unpaidSales } from '@/lib/sales';
 import { formatNaira } from '@/lib/money';
 
 export const dynamic = 'force-dynamic';
@@ -10,8 +10,12 @@ export default async function InvoicesPage({ searchParams }) {
   const params = await searchParams;
   const unpaidOnly = params?.unpaid === '1';
 
-  const sales = listSales({ limit: 200, unpaidOnly });
-  const owed = sales.reduce((sum, s) => sum + Math.max(0, s.balance_kobo), 0);
+  /* The chase list runs oldest first — the opposite of the full list. Newest
+   * first is right for looking something up and wrong for collecting money:
+   * the debt most likely to go bad is the one that has been sitting longest,
+   * and it is the one that ends up at the bottom of the page. */
+  const sales = unpaidOnly ? unpaidSales({ limit: 200 }) : listSales({ limit: 200 });
+  const owed = listSales({ limit: 500 }).reduce((sum, s) => sum + Math.max(0, s.balance_kobo), 0);
 
   return (
     <div className="space-y-6">
@@ -42,7 +46,13 @@ export default async function InvoicesPage({ searchParams }) {
                 {sale.voided ? <span className="text-xs text-stone-500">cancelled</span> : null}
               </span>
               <span className="flex items-center gap-4">
-                <span className="text-xs text-stone-400">{new Date(sale.sold_at).toLocaleDateString()}</span>
+                <span className="text-xs text-stone-400">
+                  {new Date(sale.sold_at).toLocaleDateString()}
+                  {unpaidOnly && (() => {
+                    const days = Math.floor((Date.now() - new Date(sale.sold_at)) / 86_400_000);
+                    return days >= 30 ? <span className="ml-2 text-red-700">{days} days</span> : null;
+                  })()}
+                </span>
                 {sale.balance_kobo > 0 && (
                   <span className="text-xs text-amber-700">{formatNaira(sale.balance_kobo)} owing</span>
                 )}
