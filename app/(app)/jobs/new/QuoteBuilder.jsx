@@ -164,8 +164,9 @@ export default function QuoteBuilder({ priceItems, customers, minChargeKobo = 0,
 
           <div className="grid gap-3 sm:grid-cols-6">
             <div className="sm:col-span-6">
-              <label className={label}>What is it</label>
+              <label className={label} htmlFor={`desc-${piece.key}`}>What is it</label>
               <input
+                id={`desc-${piece.key}`}
                 className={field}
                 value={piece.description}
                 onChange={(e) => update(piece.key, { description: e.target.value })}
@@ -174,36 +175,36 @@ export default function QuoteBuilder({ priceItems, customers, minChargeKobo = 0,
             </div>
 
             <div>
-              <label className={label}>Width</label>
-              <input className={field} value={piece.width} inputMode="decimal"
+              <label className={label} htmlFor={`width-${piece.key}`}>Width</label>
+              <input id={`width-${piece.key}`} className={field} value={piece.width} inputMode="decimal"
                 onChange={(e) => update(piece.key, { width: e.target.value })} />
             </div>
             <div>
-              <label className={label}>Height</label>
-              <input className={field} value={piece.height} inputMode="decimal"
+              <label className={label} htmlFor={`height-${piece.key}`}>Height</label>
+              <input id={`height-${piece.key}`} className={field} value={piece.height} inputMode="decimal"
                 onChange={(e) => update(piece.key, { height: e.target.value })} />
             </div>
             <div>
-              <label className={label}>Unit</label>
-              <select className={field} value={piece.unit} onChange={(e) => update(piece.key, { unit: e.target.value })}>
+              <label className={label} htmlFor={`unit-${piece.key}`}>Unit</label>
+              <select id={`unit-${piece.key}`} className={field} value={piece.unit} onChange={(e) => update(piece.key, { unit: e.target.value })}>
                 <option value="in">inches</option>
                 <option value="cm">cm</option>
                 <option value="mm">mm</option>
               </select>
             </div>
             <div>
-              <label className={label}>Mount (mm)</label>
-              <input className={field} value={piece.mountBorderMm} inputMode="numeric"
+              <label className={label} htmlFor={`mount-${piece.key}`}>Mount (mm)</label>
+              <input id={`mount-${piece.key}`} className={field} value={piece.mountBorderMm} inputMode="numeric"
                 onChange={(e) => update(piece.key, { mountBorderMm: e.target.value })} />
             </div>
             <div>
-              <label className={label}>Openings</label>
-              <input className={field} value={piece.mountApertures} inputMode="numeric"
+              <label className={label} htmlFor={`apertures-${piece.key}`}>Openings</label>
+              <input id={`apertures-${piece.key}`} className={field} value={piece.mountApertures} inputMode="numeric"
                 onChange={(e) => update(piece.key, { mountApertures: e.target.value })} />
             </div>
             <div>
-              <label className={label}>Quantity</label>
-              <input className={field} value={piece.quantity} inputMode="numeric"
+              <label className={label} htmlFor={`qty-${piece.key}`}>Quantity</label>
+              <input id={`qty-${piece.key}`} className={field} value={piece.quantity} inputMode="numeric"
                 onChange={(e) => update(piece.key, { quantity: e.target.value })} />
             </div>
 
@@ -214,8 +215,9 @@ export default function QuoteBuilder({ priceItems, customers, minChargeKobo = 0,
               ['backingPriceId', 'Backing', 'backing'],
             ].map(([key, text, category]) => (
               <div key={key} className="sm:col-span-3">
-                <label className={label}>{text}</label>
-                <select className={field} value={piece[key]} onChange={(e) => update(piece.key, { [key]: e.target.value })}>
+                <label className={label} htmlFor={`${key}-${piece.key}`}>{text}</label>
+                <select id={`${key}-${piece.key}`} className={field} value={piece[key]}
+                  onChange={(e) => update(piece.key, { [key]: e.target.value })}>
                   <option value="">— none —</option>
                   {byCategory(category).map((item) => (
                     <option key={item.id} value={item.id}>{item.name}</option>
@@ -225,8 +227,8 @@ export default function QuoteBuilder({ priceItems, customers, minChargeKobo = 0,
             ))}
 
             <div className="sm:col-span-3">
-              <label className={label}>Labour</label>
-              <input className={field} value={piece.labour} inputMode="decimal" placeholder="2,500"
+              <label className={label} htmlFor={`labour-${piece.key}`}>Labour</label>
+              <input id={`labour-${piece.key}`} className={field} value={piece.labour} inputMode="decimal" placeholder="2,500"
                 onChange={(e) => update(piece.key, { labour: e.target.value })} />
             </div>
           </div>

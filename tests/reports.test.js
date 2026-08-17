@@ -233,3 +233,21 @@ test('the cash position shows what is owed both ways and what is held', () => {
   assert.ok(position.owedBySopKobo > 0); // stock was taken on credit
   assert.ok(position.stockKobo > 0);
 });
+
+test('every balance sheet line carries a real amount', () => {
+  const { db, oak } = shop();
+  soldJob(db, oak, { deposit: parseAmount('5,000') });
+
+  const sheet = balanceSheet({ db });
+  for (const group of [sheet.assets, sheet.liabilities, sheet.equity]) {
+    for (const line of group) {
+      /* The trial balance calls it balanceKobo and the profit and loss calls
+       * it amountKobo. The mismatch printed a literal NaN on every line of
+       * the owner's balance sheet while the totals underneath stayed right,
+       * which reads as though the whole report is broken. */
+      assert.ok(Number.isFinite(line.amountKobo), `${line.name} has no amountKobo`);
+      assert.ok(line.name, 'a line with no name');
+    }
+  }
+  assert.ok(sheet.assets.length > 0);
+});

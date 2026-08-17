@@ -38,6 +38,7 @@ function readForm(formData) {
     cuttingKobo: money('cutting'),
     mouldingWidthMm: int('mouldingWidthMm'),
     wastageMm: int('wastageMm'),
+    materialId: String(formData.get('materialId') || '') || null,
   };
 }
 

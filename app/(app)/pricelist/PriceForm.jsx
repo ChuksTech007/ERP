@@ -59,7 +59,7 @@ function workedExample({ category, mode, price, mouldingWidthMm, wastageMm, cutt
 const field = 'w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-500 focus:outline-none';
 const label = 'block text-xs font-medium uppercase tracking-wide text-stone-500';
 
-export default function PriceForm({ item = null, onDone, showCosts = false }) {
+export default function PriceForm({ item = null, onDone, showCosts = false, materials = [] }) {
   const [state, action, pending] = useActionState(savePriceItem, null);
 
   const [category, setCategory] = useState(item?.category || 'moulding');
@@ -164,6 +164,23 @@ export default function PriceForm({ item = null, onDone, showCosts = false }) {
             <p className="mt-1 text-xs text-stone-500">Owner only. Drives the profit figure.</p>
           </div>
         )}
+
+        {/* Which stock this comes off. Not required — labour and bought-in
+            services have no material behind them — but without it a sale
+            charges the customer and takes nothing off the shelf. */}
+        <div className="sm:col-span-2">
+          <label className={label} htmlFor="materialId">Comes off which stock</label>
+          <select id="materialId" name="materialId" className={field} defaultValue={item?.material_id || ''}>
+            <option value="">— not tracked in stock —</option>
+            {materials.map((m) => (
+              <option key={m.id} value={m.id}>{m.name} ({m.pack_label})</option>
+            ))}
+          </select>
+          <p className="mt-1 text-xs text-stone-500">
+            Links this price to real stock, so selling it takes material off the shelf and the
+            profit figure uses what the shop actually paid.
+          </p>
+        </div>
 
         {category === 'moulding' && (
           <>

@@ -167,7 +167,14 @@ work is handed over.
 npm run backup     take a backup now
 npm run migrate    apply any schema updates (also runs automatically)
 npm test           check the system is sound
+npm run reset      wipe practice data and start clean (backs up first)
 ```
+
+`npm run reset` is for the moment the shop stops practising and starts using
+this for real. It clears jobs, invoices, customers, stock and prices, and puts
+the numbering back to 1 — but keeps the login, the chart of accounts and the
+settings. It takes a backup before it does anything, because "I only wanted to
+clear the test data" is a sentence people say afterwards.
 
 ---
 

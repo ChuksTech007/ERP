@@ -1,6 +1,8 @@
-import { listPriceItems, CATEGORY_LABELS, MODE_LABELS } from '@/lib/price-items';
+import Link from 'next/link';
+import { listPriceItems, getPriceItem, CATEGORY_LABELS, MODE_LABELS } from '@/lib/price-items';
 import { formatNaira } from '@/lib/money';
 import { requireUser, canSeeCosts, canManage } from '@/lib/auth';
+import { listMaterials } from '@/lib/stock';
 import { retire, restore } from './actions';
 import PriceForm from './PriceForm';
 
@@ -13,8 +15,18 @@ export default async function PriceListPage({ searchParams }) {
 
   const params = await searchParams;
   const showRetired = params?.retired === '1';
+  // Editing an existing rate matters as much as adding one: suppliers raise
+  // prices, and a list that can only be added to goes stale.
+  const editing = params?.edit ? getPriceItem(String(params.edit)) : null;
 
   const rawItems = listPriceItems({ includeRetired: showRetired });
+
+  /* Offered so a price can be tied to the stock it comes off. Without the
+   * link, collecting a job charges the customer but takes nothing off the
+   * shelf, and the shop's stock figures drift away from reality unnoticed. */
+  const materials = listMaterials().map((m) => ({
+    id: m.id, name: m.name, category: m.category, pack_label: m.pack_label,
+  }));
 
   /* Costs are stripped here, on the server, rather than hidden with CSS. A
    * column merely hidden in the browser is still in the page source, and
@@ -50,7 +62,21 @@ export default async function PriceListPage({ searchParams }) {
       )}
 
       {mayEdit ? (
-        <PriceForm showCosts={showCosts} />
+        <>
+          {editing && (
+            <div className="rounded-lg border border-stone-300 bg-stone-50 p-1">
+              <p className="px-4 pt-3 text-sm font-medium">Editing {editing.name}</p>
+              <p className="px-4 pb-2 text-xs text-stone-500">
+                Quotes already given keep the price they were given at.
+              </p>
+              <PriceForm key={editing.id} item={editing} showCosts={showCosts} materials={materials} />
+              <p className="px-4 pb-3 text-sm">
+                <Link href="/pricelist" className="text-stone-500 underline">Cancel</Link>
+              </p>
+            </div>
+          )}
+          {!editing && <PriceForm showCosts={showCosts} materials={materials} />}
+        </>
       ) : (
         <p className="rounded-lg border border-stone-200 bg-white p-4 text-sm text-stone-600">
           Prices are set by the owner. You can quote from this list but not change it.
@@ -97,12 +123,19 @@ export default async function PriceListPage({ searchParams }) {
                     )}
                     <td className="px-4 py-2 text-right">
                       {mayEdit && (
-                        <form action={item.deleted_at ? restore : retire}>
-                          <input type="hidden" name="id" value={item.id} />
-                          <button className="text-xs text-stone-500 hover:text-stone-900">
-                            {item.deleted_at ? 'Restore' : 'Retire'}
-                          </button>
-                        </form>
+                        <span className="flex items-center justify-end gap-3">
+                          {!item.deleted_at && (
+                            <Link href={`/pricelist?edit=${item.id}`} className="text-xs text-stone-500 hover:text-stone-900">
+                              Edit
+                            </Link>
+                          )}
+                          <form action={item.deleted_at ? restore : retire}>
+                            <input type="hidden" name="id" value={item.id} />
+                            <button className="text-xs text-stone-500 hover:text-stone-900">
+                              {item.deleted_at ? 'Restore' : 'Retire'}
+                            </button>
+                          </form>
+                        </span>
                       )}
                     </td>
                   </tr>
